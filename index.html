@@ -197,7 +197,8 @@
     // Call loadFromGithub when the script runs
     // You'll need to set the default GitHub URL here
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('githubUrl').value = 'https://raw.githubusercontent.com/lospotrosdistributionllc/lospotrosdistributionllc.github.io/refs/heads/main/inventory.csv'; // Set your default URL
+        //document.getElementById('githubUrl').value = 'https://raw.githubusercontent.com/lospotrosdistributionllc/lospotrosdistributionllc.github.io/refs/heads/main/inventory.csv'; // Set your default URL
+        document.getElementById('githubUrl').value = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTDgr5yRxUVCL-UoFj3COkPLc_XTaEMvGA_ULT7QkkX8UuysPz1c6LPtQBUuBV6GvC-PRI7jt8wshuM/pub?gid=2078665377&single=true&output=csv"; // Set your default URL
         loadFromGithub();
     });
 </script>
