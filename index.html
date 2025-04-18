@@ -1,174 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Inventory Search with Barcodes</title>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Inventory Search with Barcodes (Loading from GitHub)</title>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f9f9f9;
-    }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
 
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      font-size: 16px;
-    }
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
 
-    .card-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      margin-top: 20px;
-    }
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            width: 240px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-    .card {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 15px;
-      width: 240px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+        .card img {
+            max-width: 100%;
+            max-height: 150px;
+            display: block;
+            margin: 10px 0;
+            object-fit: contain;
+        }
 
-    .card img {
-      max-width: 100%;
-      max-height: 150px;
-      display: block;
-      margin: 10px 0;
-      object-fit: contain;
-    }
+        .card .desc {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
 
-    .card .desc {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
+        .card .meta {
+            font-size: 14px;
+            color: #555;
+        }
 
-    .card .meta {
-      font-size: 14px;
-      color: #555;
-    }
+        .upload {
+            margin-bottom: 10px;
+        }
 
-    .upload {
-      margin-bottom: 10px;
-    }
-
-	 .barcode {
-	  max-width: 100%;
-	  height: auto;
-	  margin-top: 5px;
-	}
-  </style>
+        .barcode {
+            max-width: 100%;
+            height: auto;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>Inventory Search (with Barcodes)</h1>
+    <h1>Inventory Search (with Barcodes)</h1>
 
-  <div class="upload">
-    <input type="file" id="csvInput" accept=".csv">
-  </div>
+    <div class="upload">
+        <label for="githubUrl" style="display: none;">Load CSV from GitHub URL:</label>
+        <input type="text" style="display: none;" id="githubUrl" placeholder="https://raw.githubusercontent.com/lospotrosdistributionllc/lospotrosdistributionllc.github.io/refs/heads/main/inventory.csv">
+        <button style="display: none;" onclick="loadFromGithub()">Load</button>
+    </div>
 
-  <input type="text" id="searchBox" placeholder="Search by Description, UPC, or Price">
-  <button onclick="search()">Search</button>
-  <button onclick="clearSearch()">Clear</button>
+    <input type="text" id="searchBox" placeholder="Search by Description, UPC, or Price">
+    <button onclick="search()">Search</button>
+    <button onclick="clearSearch()">Clear</button>
 
-  <div id="results"></div>
+    <div id="results"></div>
 
-  <script>
+ <script>
     let data = [];
 
-window.onload = function() {
-  const csvUrl = 'https://github.com/lospotrosdistributionllc/lospotrosdistributionllc.github.io/blob/main/inventory.csv';
-
-  Papa.parse(csvUrl, {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    dynamicTyping: false,
-    complete: function(results) {
-      data = results.data;
-      document.getElementById('results').innerHTML = '<p>CSV loaded from Google Drive. Enter a search term.</p>';
-    },
-    error: function(err) {
-      console.error("Error loading CSV:", err);
-      document.getElementById('results').innerHTML = '<p>Failed to load CSV file from Google Drive.</p>';
+    function loadFromGithub() {
+        const githubUrl = document.getElementById('githubUrl').value;
+        if (githubUrl) {
+            Papa.parse(githubUrl, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                dynamicTyping: false, // prevents scientific notation
+                complete: function(results) {
+                    data = results.data;
+                    document.getElementById('results').innerHTML = '<p style="display: none;">CSV loaded from GitHub. Enter a search term.</p>';
+                },
+                error: function(error) {
+                    console.error("Error loading or parsing CSV from GitHub:", error);
+                    document.getElementById('results').innerHTML = '<p class="error">Failed to load CSV from the provided GitHub URL.</p>';
+                }
+            });
+        } else {
+            alert("Please enter a GitHub URL.");
+        }
     }
-  });
-};
 
     function formatUPC(value) {
-      if (!value) return '';
-      let str = value.toString();
-      if (str.includes('e') || str.includes('E')) {
-        const num = Number(value);
-        return num.toFixed(0);
-      }
-      return str;
+        if (!value) return '';
+        let str = value.toString();
+        if (str.includes('e') || str.includes('E')) {
+            const num = Number(value);
+            return num.toFixed(0);
+        }
+        return str;
     }
 
     function search() {
-      const term = document.getElementById('searchBox').value.toLowerCase();
+        const term = document.getElementById('searchBox').value.toLowerCase();
 
-      const results = data.filter(row =>
-        (row["Description"] && row["Description"].toLowerCase().includes(term)) ||
-        (row["UPC"] && row["UPC"].toLowerCase().includes(term)) ||
-        (row["Current Price"] && row["Current Price"].toString().toLowerCase().includes(term))
-      );
+        const results = data.filter(row =>
+            (row["Description"] && row["Description"].toLowerCase().includes(term)) ||
+            (row["UPC"] && row["UPC"].toLowerCase().includes(term)) ||
+            (row["Current Price"] && row["Current Price"].toString().toLowerCase().includes(term))
+        );
 
-      displayResults(results);
+        displayResults(results);
     }
 
     function clearSearch() {
-      document.getElementById('searchBox').value = '';
-      document.getElementById('results').innerHTML = '';
+        document.getElementById('searchBox').value = '';
+        document.getElementById('results').innerHTML = '';
     }
 
     function displayResults(rows) {
-      if (rows.length === 0) {
-        document.getElementById('results').innerHTML = '<p>No results found.</p>';
-        return;
-      }
+        if (rows.length === 0) {
+            document.getElementById('results').innerHTML = '<p>No results found.</p>';
+            return;
+        }
 
-      let html = '<div class="card-container">';
+        let html = '<div class="card-container">';
 
-      rows.forEach((row, index) => {
-        const upc = formatUPC(row["UPC"]);
-        const barcodeId = `barcode-${index}`;
+        rows.forEach((row, index) => {
+            const upc = formatUPC(row["UPC"]);
+            const barcodeId = `barcode-${index}`;
 
-html += `
-  <div class="card">
-    <div class="desc">${row["Description"] || ''}</div>
-    <img src="${row["Primary Image"]}" alt="Product Image">
-    <div class="meta">UPC: ${upc}</div>
-    ${upc && /^[0-9]{6,}$/.test(upc) ? `<svg id="${barcodeId}" class="barcode"></svg>` : '<div class="meta">No valid barcode</div>'}
-    <div class="meta">Current Price: $${row["Current Price"] || ''}</div>
-  </div>
-`;
-      });
+            html += `
+                <div class="card">
+                    <div class="desc">${row["Description"] || ''}</div>
+                    <img src="${row["Primary Image"]}" alt="Product Image">
+                    <div class="meta">UPC: ${upc}</div>
+                    ${upc && /^[0-9]{6,}$/.test(upc) ? `<svg id="${barcodeId}" class="barcode"></svg>` : '<div class="meta">No valid barcode</div>'}
+                    <div class="meta">Current Price: $${row["Current Price"] || ''}</div>
+                </div>
+            `;
+        });
 
-      html += '</div>';
-      document.getElementById('results').innerHTML = html;
+        html += '</div>';
+        document.getElementById('results').innerHTML = html;
 
-      // After rendering, draw barcodes
-      rows.forEach((row, index) => {
-        const upc = formatUPC(row["UPC"]);
-        const barcodeId = `barcode-${index}`;
-if (upc && /^[0-9]{6,}$/.test(upc)) {
-  JsBarcode(`#${barcodeId}`, upc, {
-    format: "CODE128",
-    lineColor: "#000",
-    width: 2,
-    height: 40,
-    displayValue: false
-  });
-}
-      });
+        // After rendering, draw barcodes
+        rows.forEach((row, index) => {
+            const upc = formatUPC(row["UPC"]);
+            const barcodeId = `barcode-${index}`;
+            if (upc && /^[0-9]{6,}$/.test(upc)) {
+                JsBarcode(`#${barcodeId}`, upc, {
+                    format: "CODE128",
+                    lineColor: "#000",
+                    width: 2,
+                    height: 40,
+                    displayValue: false
+                });
+            }
+        });
     }
-  </script>
+
+    // Call loadFromGithub when the script runs
+    // You'll need to set the default GitHub URL here
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('githubUrl').value = 'https://raw.githubusercontent.com/lospotrosdistributionllc/lospotrosdistributionllc.github.io/refs/heads/main/inventory.csv'; // Set your default URL
+        loadFromGithub();
+    });
+</script>
 
 </body>
 </html>
