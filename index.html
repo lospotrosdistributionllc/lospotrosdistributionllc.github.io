@@ -2,10 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Inventory Search with Barcodes (Loading from GitHub)</title>
+    <title>Los Potros Distribution LLC</title>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
+	    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+	  background-color: #45b6fe;
+    }
+    .header h1 {
+      margin: 0;
+	  background-color: #45b6fe;
+    }
+    .header img {
+      max-height: 50px; /* Adjust the height as needed */
+    }
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
@@ -63,9 +76,17 @@
         }
     </style>
 </head>
-<body>
-
-    <h1>Inventory Search (with Barcodes)</h1>
+<body style="background-color: #45b6fe">
+	<div class="header">
+    <h1>Los Potros Distribution LLC</h1>
+	 <img src="logo.png" alt="Logo" />
+	 </div >
+	 <div style="background-color: #45b6fe">
+      <p >
+	  Address: 4650 W Van Buren St, Phoenix, AZ 85043<br />
+	  Phone: (602) 272-8952<br />
+     </p>
+	  </div>
 
     <div class="upload">
         <label for="githubUrl" style="display: none;">Load CSV from GitHub URL:</label>
