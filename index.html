@@ -81,20 +81,24 @@
   <script>
     let data = [];
 
-    document.getElementById('csvInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        Papa.parse(file, {
-          header: true,
-          skipEmptyLines: true,
-          dynamicTyping: false, // prevents scientific notation
-          complete: function(results) {
-            data = results.data;
-            document.getElementById('results').innerHTML = '<p>CSV loaded. Enter a search term.</p>';
-          }
-        });
-      }
-    });
+window.onload = function() {
+  const csvUrl = 'https://github.com/lospotrosdistributionllc/lospotrosdistributionllc.github.io/blob/main/inventory.csv';
+
+  Papa.parse(csvUrl, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    dynamicTyping: false,
+    complete: function(results) {
+      data = results.data;
+      document.getElementById('results').innerHTML = '<p>CSV loaded from Google Drive. Enter a search term.</p>';
+    },
+    error: function(err) {
+      console.error("Error loading CSV:", err);
+      document.getElementById('results').innerHTML = '<p>Failed to load CSV file from Google Drive.</p>';
+    }
+  });
+};
 
     function formatUPC(value) {
       if (!value) return '';
