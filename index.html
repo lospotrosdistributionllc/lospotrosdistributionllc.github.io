@@ -170,7 +170,7 @@
                     <img src="${row["Primary Image"]}" alt="Product Image">
                     <div class="meta">UPC: ${upc}</div>
                     ${upc && /^[0-9]{6,}$/.test(upc) ? `<svg id="${barcodeId}" class="barcode"></svg>` : '<div class="meta">No valid barcode</div>'}
-                    <div class="meta">Current Price: $${row["Current Price"] || ''}</div>
+                    <!-- <div class="meta">Current Price: $${row["Current Price"] || ''}</div> -->
                 </div>
             `;
         });
